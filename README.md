@@ -1,3 +1,5 @@
+'''
+mermaid
 erDiagram
     MESA ||--o{ ATENDIMENTO : possui
     ATENDIMENTO ||--o{ PEDIDO : registra
@@ -39,3 +41,4 @@ erDiagram
         float valor
         datetime data
     }
+'''
