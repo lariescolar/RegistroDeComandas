@@ -40,3 +40,17 @@ erDiagram
         float valor
         datetime data
     }
+
+
+# Registro de Comandas
+
+## Componentes
+- Vitória Vale de Oliveira Da Silva  
+- Lucas Barbosa de Lima  
+- Larissa Beatriz Teixeira de Sousa  
+
+## Tema do projeto
+**Registro de Comandas**
+
+## Descrição
+O projeto consiste em um sistema para controle de comandas de uma lanchonete, permitindo o cadastro de mesas e produtos, a abertura de atendimentos, o registro de pedidos e pagamentos, além do acompanhamento do saldo e do encerramento da comanda.
