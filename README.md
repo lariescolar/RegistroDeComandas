@@ -40,6 +40,3 @@ erDiagram
         float valor
         datetime data
     }
-
-```md
-Este diagrama mostra a estrutura principal do sistema de registro de comandas. Uma mesa pode ter vários atendimentos ao longo do tempo, cada atendimento pode registrar vários pedidos e pagamentos, e cada pedido está vinculado a um produto específico.
