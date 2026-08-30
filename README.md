@@ -102,15 +102,16 @@ RegistroDeComandas/
 
 O sistema possui os seguintes modelos principais:
 
-Mesa
-Atendimento
-Produto
-Pedido
-Pagamento
+- Mesa
+- Atendimento
+- Produto
+- Pedido
+- Pagamento
 
 A classe Produto é abstrata e utiliza herança e polimorfismo para representar diferentes tipos de produtos.
 
 Os objetos se relacionam por meio de referências aos próprios objetos, mantendo a integração entre os modelos.
+
 
 🔗 Relacionamentos
 
@@ -130,6 +131,7 @@ Um atendimento pode possuir vários pedidos e vários pagamentos.
 
 Cada pedido está associado a um produto.
 
+
 💰 Controle da comanda
 
 O Atendimento calcula automaticamente as informações financeiras da comanda.
@@ -144,6 +146,7 @@ Saldo
 = Total - Total pago
 
 Esses valores são calculados a partir dos objetos existentes e não são armazenados manualmente.
+
 
 ⚠️ Regras de negócio
 
@@ -196,13 +199,14 @@ MenuPrincipal
 └── MenuAtendimentos
 ```
 Telas:
-
+```
 TelaMesas
 TelaProdutos
 TelaAtendimentos
-
+```
 📊 Diagrama Entidade-Relacionamento
 
+```mermaid
 erDiagram
     MESA ||--o{ ATENDIMENTO : possui
     ATENDIMENTO ||--o{ PEDIDO : registra
@@ -240,7 +244,8 @@ erDiagram
     PAGAMENTO {
         float valor
     }
-    
+```
+
 📚 Conceitos utilizados
 
 O projeto demonstra a aplicação dos seguintes conceitos de Programação Orientada a Objetos:
@@ -257,11 +262,15 @@ Docstrings;
 Organização em módulos e pacotes;
 Gerenciamento de dados em memória.
 
+
 🚀 Execução
 Para executar o sistema, utilize:
+```
 python main.py
+```
 
 🎯 Fluxo principal
+```
 Cadastrar mesas e produtos
           ↓
 Abrir atendimento
@@ -281,8 +290,10 @@ Encerrar atendimento
 Liberar mesa
           ↓
 Consultar histórico
+```
 
 📁 Organização das responsabilidades
+```
 MODELOS
     ↓
 Objetos e regras do domínio
