@@ -98,10 +98,8 @@ RegistroDeComandas/
         └── tela_atendimentos.py
 ```
 
-🧩 Modelos
-
+## 🧩 Modelos
 O sistema possui os seguintes modelos principais:
-
 - Mesa
 - Atendimento
 - Produto
@@ -109,14 +107,12 @@ O sistema possui os seguintes modelos principais:
 - Pagamento
 
 A classe Produto é abstrata e utiliza herança e polimorfismo para representar diferentes tipos de produtos.
-
 Os objetos se relacionam por meio de referências aos próprios objetos, mantendo a integração entre os modelos.
 
-
-🔗 Relacionamentos
+## 🔗 Relacionamentos
 
 Os principais relacionamentos entre os objetos são:
-
+```
 Mesa 1 ───────── N Atendimento
 
 Atendimento 1 ───────── N Pedido
@@ -124,6 +120,7 @@ Atendimento 1 ───────── N Pedido
 Produto 1 ───────── N Pedido
 
 Atendimento 1 ───────── N Pagamento
+```
 
 Uma mesa pode possuir vários atendimentos ao longo do tempo, porém apenas um atendimento pode estar aberto simultaneamente.
 
@@ -131,11 +128,9 @@ Um atendimento pode possuir vários pedidos e vários pagamentos.
 
 Cada pedido está associado a um produto.
 
-
-💰 Controle da comanda
-
+## 💰 Controle da comanda
 O Atendimento calcula automaticamente as informações financeiras da comanda.
-
+```
 Total
 = soma dos valores dos pedidos
 
@@ -144,12 +139,10 @@ Total pago
 
 Saldo
 = Total - Total pago
-
+```
 Esses valores são calculados a partir dos objetos existentes e não são armazenados manualmente.
 
-
-⚠️ Regras de negócio
-
+## ⚠️ Regras de negócio
 Mesas
 - Não é permitido abrir dois atendimentos simultaneamente para a mesma mesa.
 - Uma mesa ocupada não pode receber um novo atendimento.
@@ -170,7 +163,7 @@ Pagamentos
 - Não é permitido realizar pagamento superior ao saldo da comanda.
 - É possível realizar vários pagamentos parciais.
 
-⚠️ Exceções personalizadas
+## ⚠️ Exceções personalizadas
 
 O projeto possui uma hierarquia de exceções baseada em LanchoneteError.
 ```
@@ -186,7 +179,7 @@ LanchoneteError
 ```
 As exceções são utilizadas para impedir operações que violem as regras de negócio do sistema.
 
-🖥️ Interface
+## 🖥️ Interface
 
 A interface textual foi organizada em menus e telas, seguindo a separação entre navegação e interação com as funcionalidades.
 
@@ -204,7 +197,8 @@ TelaMesas
 TelaProdutos
 TelaAtendimentos
 ```
-📊 Diagrama Entidade-Relacionamento
+
+## 📊 Diagrama Entidade-Relacionamento
 
 ```mermaid
 erDiagram
@@ -246,30 +240,29 @@ erDiagram
     }
 ```
 
-📚 Conceitos utilizados
+## 📚 Conceitos utilizados
 
 O projeto demonstra a aplicação dos seguintes conceitos de Programação Orientada a Objetos:
 
-Classes e objetos;
-Encapsulamento;
-Abstração;
-Herança;
-Polimorfismo;
-Relacionamento entre objetos;
-Exceções personalizadas;
-Type Hints;
-Docstrings;
-Organização em módulos e pacotes;
-Gerenciamento de dados em memória.
+- Classes e objetos;
+- Encapsulamento;
+- Abstração;
+- Herança;
+- Polimorfismo;
+- Relacionamento entre objetos;
+- Exceções personalizadas;
+- Type Hints;
+- Docstrings;
+- Organização em módulos e pacotes;
+- Gerenciamento de dados em memória.
 
-
-🚀 Execução
+## 🚀 Execução
 Para executar o sistema, utilize:
 ```
 python main.py
 ```
 
-🎯 Fluxo principal
+## 🎯 Fluxo principal
 ```
 Cadastrar mesas e produtos
           ↓
@@ -292,7 +285,7 @@ Liberar mesa
 Consultar histórico
 ```
 
-📁 Organização das responsabilidades
+## 📁 Organização das responsabilidades
 ```
 MODELOS
     ↓
