@@ -66,6 +66,29 @@ class Produto(ABC):
         """
         pass
 
+    def to_dict(self) -> dict:
+        """Converte a instância em um dicionário para persistência em JSON."""
+        return {
+            "codigo": self.__codigo,
+            "nome": self.__nome,
+            "preco": self.__preco,
+            "disponivel": self.__disponivel,
+            "tipo": self.__class__.__name__,
+        }
+
+    @classmethod
+    def from_dict(cls, dados: dict) -> "Produto":
+        """Reconstrói uma instância concreta de Produto a partir de um dicionário."""
+        tipo = dados.get("tipo", "")
+        codigo = int(dados["codigo"])
+        nome = str(dados["nome"])
+        preco = float(dados["preco"])
+        disponivel = bool(dados.get("disponivel", True))
+
+        if tipo == "Sanduiche":
+            return Sanduiche(codigo=codigo, nome=nome, preco=preco, disponivel=disponivel)
+        return Suco(codigo=codigo, nome=nome, preco=preco, disponivel=disponivel)
+
     def __str__(self) -> str:
         status = "Disponível" if self.__disponivel else "Indisponível"
         return (

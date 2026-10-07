@@ -13,11 +13,16 @@ class Atendimento:
     """Representa um atendimento de uma mesa,
     contendo pedidos e pagamentos."""
 
-    def __init__(self, mesa: Mesa):
+    def __init__(self, mesa: Mesa, id_atendimento: int | None = None):
+        self.__id: int | None = id_atendimento
         self.__mesa: Mesa = mesa
         self.__pedidos: list[Pedido] = []
         self.__pagamentos: list[Pagamento] = []
         self.__encerrado: bool = False
+
+    @property
+    def id(self) -> int | None:
+        return self.__id
 
     @property
     def mesa(self) -> Mesa:
@@ -81,6 +86,39 @@ class Atendimento:
 
         self.__encerrado = True
         self.__mesa.liberar()
+
+    def to_dict(self) -> dict:
+        return {
+            "id": self.__id,
+            "numero_mesa": self.__mesa.numero,
+            "pedido_ids": [
+                getattr(pedido, "id")
+                for pedido in self.__pedidos
+                if hasattr(pedido, "id")
+            ],
+            "pagamento_ids": [
+                getattr(pagamento, "id")
+                for pagamento in self.__pagamentos
+                if hasattr(pagamento, "id")
+            ],
+            "encerrado": self.__encerrado,
+        }
+
+    @classmethod
+    def from_dict(
+        cls,
+        dados: dict,
+        mesa: Mesa,
+        pedidos: list[Pedido] | None = None,
+        pagamentos: list[Pagamento] | None = None,
+    ) -> "Atendimento":
+        atendimento = cls(mesa=mesa, id_atendimento=dados.get("id"))
+        if pedidos:
+            atendimento.__pedidos = pedidos
+        if pagamentos:
+            atendimento.__pagamentos = pagamentos
+        atendimento.__encerrado = dados.get("encerrado", False)
+        return atendimento
 
     def __str__(self) -> str:
         status = "Encerrado" if self.__encerrado else "Em aberto"

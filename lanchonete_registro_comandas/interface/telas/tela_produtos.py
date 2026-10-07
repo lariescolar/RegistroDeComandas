@@ -1,7 +1,6 @@
 from interface.tela import Tela
 from modelos.produto import Produto, Suco, Sanduiche
-from servicos.produto_service import ProdutoService
-from excecoes.lanchonete_error import ProdutoNaoEncontradoError
+from lanchonete import Lanchonete
 
 
 def _ler_int(mensagem: str) -> int:
@@ -23,22 +22,14 @@ def _ler_float(mensagem: str) -> float:
 class TelaProdutos(Tela):
     """Tela responsável pelas operações relacionadas aos produtos."""
 
-    def __init__(self, produto_service: ProdutoService) -> None:
-        self.__produto_service = produto_service
+    def __init__(self, lanchonete: Lanchonete) -> None:
+        self.__lanchonete = lanchonete
 
     def exibir(self) -> None:
         self.listar_produtos()
 
     def cadastrar_produto(self) -> None:
         codigo = _ler_int("Código do produto: ")
-
-        try:
-            self.__produto_service.localizar_produto(codigo)
-            print("Esse produto já foi cadastrado.")
-            return
-        except ProdutoNaoEncontradoError:
-            pass
-
         nome = input("Nome do produto: ").strip()
         preco = _ler_float("Preço do produto: ")
         tipo = input("Tipo (1 - Suco | 2 - Sanduíche): ").strip()
@@ -54,11 +45,11 @@ class TelaProdutos(Tela):
             print("Tipo de produto inválido.")
             return
 
-        self.__produto_service.cadastrar_produto(produto)
+        self.__lanchonete.cadastrar_produto(produto)
         print("Produto cadastrado com sucesso.")
 
     def listar_produtos(self) -> None:
-        produtos = self.__produto_service.listar_produtos()
+        produtos = self.__lanchonete.produtos
 
         if not produtos:
             print("Nenhum produto cadastrado.")
@@ -72,8 +63,8 @@ class TelaProdutos(Tela):
         codigo = _ler_int("Código do produto: ")
 
         try:
-            produto = self.__produto_service.localizar_produto(codigo)
-        except ProdutoNaoEncontradoError as exc:
+            produto = self.__lanchonete.localizar_produto(codigo)
+        except Exception as exc:
             print(exc)
             return
 

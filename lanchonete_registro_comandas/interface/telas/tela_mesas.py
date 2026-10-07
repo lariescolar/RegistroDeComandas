@@ -1,6 +1,6 @@
 from interface.tela import Tela
 from modelos.mesa import Mesa
-from servicos.mesa_service import MesaService
+from lanchonete import Lanchonete
 
 
 def _ler_int(mensagem: str) -> int:
@@ -14,8 +14,8 @@ def _ler_int(mensagem: str) -> int:
 class TelaMesas(Tela):
     """Tela responsável pelas operações relacionadas às mesas."""
 
-    def __init__(self, mesa_service: MesaService) -> None:
-        self.__mesa_service = mesa_service
+    def __init__(self, lanchonete: Lanchonete) -> None:
+        self.__lanchonete = lanchonete
 
     def exibir(self) -> None:
         self.listar_mesas()
@@ -23,15 +23,15 @@ class TelaMesas(Tela):
     def cadastrar_mesa(self) -> None:
         numero = _ler_int("Número da mesa: ")
 
-        if self.__mesa_service.localizar_mesa(numero) is not None:
+        if self.__lanchonete.localizar_mesa(numero) is not None:
             print("Essa mesa já foi cadastrada.")
             return
 
-        self.__mesa_service.cadastrar_mesa(Mesa(numero))
+        self.__lanchonete.cadastrar_mesa(Mesa(numero))
         print("Mesa cadastrada com sucesso.")
 
     def listar_mesas(self) -> None:
-        mesas = self.__mesa_service.listar_mesas()
+        mesas = self.__lanchonete.mesas
 
         if not mesas:
             print("Nenhuma mesa cadastrada.")
@@ -43,7 +43,7 @@ class TelaMesas(Tela):
 
     def consultar_disponibilidade(self) -> None:
         numero = _ler_int("Número da mesa: ")
-        mesa = self.__mesa_service.localizar_mesa(numero)
+        mesa = self.__lanchonete.localizar_mesa(numero)
 
         if mesa is None:
             print("Mesa não encontrada.")

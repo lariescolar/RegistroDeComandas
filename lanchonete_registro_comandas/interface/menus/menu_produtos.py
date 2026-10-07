@@ -1,12 +1,13 @@
 from interface.menu import Menu
 from interface.telas.tela_produtos import TelaProdutos
+from lanchonete import Lanchonete
 
 
 class MenuProdutos(Menu):
-    """Menu responsável pelas operações relacionadas aos produtos."""
+    """Menu de produtos do sistema."""
 
-    def __init__(self, tela: TelaProdutos) -> None:
-        self.__tela = tela
+    def __init__(self, lanchonete: Lanchonete) -> None:
+        self.__tela = TelaProdutos(lanchonete)
 
     def executar(self) -> None:
         while True:

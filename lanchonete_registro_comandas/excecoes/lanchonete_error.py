@@ -36,3 +36,18 @@ class PagamentoInvalidoError(LanchoneteError):
 class AtendimentoNaoQuitadoError(LanchoneteError):
     """Indica que o atendimento ainda possui saldo pendente."""
     pass
+
+
+class PersistenciaError(LanchoneteError):
+    """Exceção base para erros na camada de persistência."""
+    pass
+
+
+class ArquivoCorrompidoError(PersistenciaError):
+    """Indica que um arquivo JSON está corrompido ou com formato inválido."""
+    pass
+
+
+class RelacionamentoInvalidoError(PersistenciaError):
+    """Indica que um ID referenciado no arquivo JSON não existe."""
+    pass

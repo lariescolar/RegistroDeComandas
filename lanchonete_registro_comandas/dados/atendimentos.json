@@ -1,0 +1,14 @@
+[
+    {
+        "id": 1,
+        "numero_mesa": 1,
+        "pedido_ids": [
+            1,
+            2
+        ],
+        "pagamento_ids": [
+            1
+        ],
+        "encerrado": true
+    }
+]

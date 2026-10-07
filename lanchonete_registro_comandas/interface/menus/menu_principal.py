@@ -1,13 +1,15 @@
 from interface.menu import Menu
+from interface.menus.menu_mesas import MenuMesas
+from interface.menus.menu_produtos import MenuProdutos
+from interface.menus.menu_atendimentos import MenuAtendimentos
+from lanchonete import Lanchonete
 
 
 class MenuPrincipal(Menu):
     """Menu principal do sistema."""
 
-    def __init__(self, menu_mesas: Menu, menu_produtos: Menu, menu_atendimentos: Menu) -> None:
-        self.__menu_mesas = menu_mesas
-        self.__menu_produtos = menu_produtos
-        self.__menu_atendimentos = menu_atendimentos
+    def __init__(self, lanchonete: Lanchonete) -> None:
+        self.__lanchonete = lanchonete
 
     def executar(self) -> None:
         while True:
@@ -20,11 +22,11 @@ class MenuPrincipal(Menu):
             opcao = input("Escolha uma opção: ")
 
             if opcao == "1":
-                self.__menu_mesas.executar()
+                MenuMesas(self.__lanchonete).executar()
             elif opcao == "2":
-                self.__menu_produtos.executar()
+                MenuProdutos(self.__lanchonete).executar()
             elif opcao == "3":
-                self.__menu_atendimentos.executar()
+                MenuAtendimentos(self.__lanchonete).executar()
             elif opcao == "0":
                 print("Saindo...")
                 break
