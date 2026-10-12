@@ -1,0 +1,40 @@
+erDiagram
+    MESA ||--o{ ATENDIMENTO : possui
+    ATENDIMENTO ||--o{ PEDIDO : registra
+    PRODUTO ||--o{ PEDIDO : compoe
+    ATENDIMENTO ||--o{ PAGAMENTO : recebe
+
+    MESA {
+        int numero PK
+        bool ocupada
+    }
+
+    ATENDIMENTO {
+        int id PK
+        int mesa_numero FK
+        bool encerrado
+        decimal total
+        decimal total_pago
+        decimal saldo
+    }
+
+    PRODUTO {
+        int codigo PK
+        string nome UK
+        decimal preco
+        bool disponivel
+    }
+
+    PEDIDO {
+        int id PK
+        int atendimento_id FK
+        int produto_codigo FK
+        int quantidade
+        decimal valor
+    }
+
+    PAGAMENTO {
+        int id PK
+        int atendimento_id FK
+        decimal valor
+    }
