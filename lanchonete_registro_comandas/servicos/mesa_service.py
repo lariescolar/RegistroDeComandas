@@ -26,3 +26,19 @@ class MesaService:
     def listar_mesas(self) -> list[Mesa]:
         """Retorna a lista de mesas cadastradas."""
         return self.__aplicacao.mesas
+    
+    def bloquear_mesa(self, numero: int) -> bool | None:
+        """Bloqueia uma mesa pelo número"""
+        for mesa in self.__aplicacao.mesas:
+            if mesa.numero == numero:
+                mesa.bloquear()
+                return mesa.bloqueada
+        return None
+    
+    def desbloquear_mesa(self, numero: int) -> bool | None:
+        """Desbloqueia uma mesa pelo número"""
+        for mesa in self.__aplicacao.mesas:
+            if mesa.numero == numero:
+                mesa.desbloquear()
+                return mesa.bloqueada
+        return None

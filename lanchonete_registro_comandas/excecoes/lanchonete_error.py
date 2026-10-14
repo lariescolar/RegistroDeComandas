@@ -7,6 +7,9 @@ class MesaOcupadaError(LanchoneteError):
     """Indica que a mesa já possui um atendimento em andamento."""
     pass
 
+class MesaBloqueadaError(LanchoneteError):
+    """Indica que a mesa está bloqueada e não pode ser utilizada."""
+    pass
 
 class AtendimentoEncerradoError(LanchoneteError):
     """Indica que o atendimento já foi encerrado."""

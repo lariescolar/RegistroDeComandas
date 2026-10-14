@@ -8,6 +8,7 @@ from excecoes.lanchonete_error import (
     AtendimentoNaoEncontradoError,
     MesaOcupadaError,
     ProdutoNaoEncontradoError,
+    MesaBloqueadaError
 )
 
 from persistencia.produto_persistencia import ProdutoPersistencia
@@ -110,7 +111,21 @@ class Lanchonete:
             if mesa.numero == numero:
                 return mesa
         return None
+    
+    def bloquear_mesa(self, numero: int) -> bool | None:
+        for mesa in self.__mesas:
+            if mesa.numero == numero:
+                mesa.bloquear()
+                return mesa.bloqueada
+        return None
 
+    def desbloquear_mesa(self, numero: int) -> bool | None:
+        for mesa in self.__mesas:
+            if mesa.numero == numero:
+                mesa.desbloquear()
+                return mesa.bloqueada
+        return None
+    
     def localizar_produto(self, codigo: int) -> Produto:
         for produto in self.__produtos:
             if produto.codigo == codigo:
@@ -119,8 +134,10 @@ class Lanchonete:
 
     def abrir_atendimento(self, mesa: Mesa) -> Atendimento:
         if mesa.ocupada:
-            raise MesaOcupadaError("A mesa já está ocupada.")
-
+            raise MesaOcupadaError("A mesa já está ocupada!")
+        elif mesa.bloqueada:
+            raise MesaBloqueadaError("A mesa está bloqueada!")
+        
         proximo_id = max([a.id for a in self.__atendimentos if a.id is not None], default=0) + 1
         atendimento = Atendimento(mesa, id_atendimento=proximo_id)
         mesa.ocupar()

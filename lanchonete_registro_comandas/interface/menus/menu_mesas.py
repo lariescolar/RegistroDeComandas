@@ -14,7 +14,9 @@ class MenuMesas(Menu):
             print("\n===== Menu de Mesas =====")
             print("1 - Cadastrar mesa")
             print("2 - Listar mesas")
-            print("3 - Consultar disponibilidade")
+            print("3 - Bloquear mesa")
+            print("4 - Desbloquear mesa")
+            print("5 - Consultar disponibilidade")
             print("0 - Voltar")
 
             opcao = input("Escolha uma opção: ")
@@ -24,6 +26,10 @@ class MenuMesas(Menu):
             elif opcao == "2":
                 self.__tela.listar_mesas()
             elif opcao == "3":
+                self.__tela.bloquear_mesa()
+            elif opcao == "4":
+                self.__tela.desbloquear_mesa()
+            elif opcao == "5":
                 self.__tela.consultar_disponibilidade()
             elif opcao == "0":
                 break

@@ -41,6 +41,36 @@ class TelaMesas(Tela):
         for mesa in mesas:
             print(mesa)
 
+    def bloquear_mesa(self) -> None:
+        numero = _ler_int("Número da mesa: ")
+        mesa = self.__lanchonete.localizar_mesa(numero)
+
+        if mesa is None:
+            print("Mesa não encontrada.")
+            return
+        
+        elif mesa.bloqueada == True:
+            print("Esta mesa já está bloqueada!")
+            return
+        
+        self.__lanchonete.bloquear_mesa(mesa.numero)
+        print(f"A mesa {mesa.numero} foi bloqueada com sucesso!")
+
+    def desbloquear_mesa(self) -> None:
+        numero = _ler_int("Número da mesa: ")
+        mesa = self.__lanchonete.localizar_mesa(numero)
+
+        if mesa is None:
+            print("Mesa não encontrada.")
+            return
+        
+        elif mesa.bloqueada == False:
+            print("Esta mesa já está desbloqueada!")
+            return
+        
+        self.__lanchonete.desbloquear_mesa(mesa.numero)
+        print(f"A mesa {mesa.numero} foi desbloqueada com sucesso!")
+    
     def consultar_disponibilidade(self) -> None:
         numero = _ler_int("Número da mesa: ")
         mesa = self.__lanchonete.localizar_mesa(numero)
@@ -49,5 +79,5 @@ class TelaMesas(Tela):
             print("Mesa não encontrada.")
             return
 
-        status = "ocupada" if mesa.ocupada else "disponível"
+        status = "ocupada/bloqueada" if mesa.ocupada or mesa.bloqueada else "disponível"
         print(f"A mesa {mesa.numero} está {status}.")
