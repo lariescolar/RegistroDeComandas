@@ -1,4 +1,5 @@
 from interface.tela import Tela
+from formatacao import formatar_moeda
 from modelos.pedido import Pedido
 from modelos.pagamento import Pagamento
 from lanchonete import Lanchonete
@@ -37,6 +38,13 @@ class TelaAtendimentos(Tela):
 
     def exibir(self) -> None:
         self.consultar_historico()
+
+    def exibir_totais_gerais(self) -> None:
+        """Exibe o total geral dos atendimentos e dos pagamentos registrados."""
+        total = self.__lanchonete.total_geral_atendimentos
+        pago = self.__lanchonete.total_geral_pagamentos
+        print(f"Total dos atendimentos: {formatar_moeda(total)}")
+        print(f"Total pago: {formatar_moeda(pago)}")
 
     def _ler_mesa(self):
         numero = _ler_int("Número da mesa: ")

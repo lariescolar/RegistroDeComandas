@@ -1,3 +1,4 @@
+from formatacao import formatar_moeda
 from modelos.produto import Produto
 from excecoes.lanchonete_error import QuantidadeInvalidaError
 
@@ -61,5 +62,5 @@ class Pedido:
     def __str__(self) -> str:
         return (
             f"{self.__produto.nome} x {self.__quantidade} - "
-            f"R$ {self.valor:.2f}"
+            f"{formatar_moeda(self.valor)}"
         )

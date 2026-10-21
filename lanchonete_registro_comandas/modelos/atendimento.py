@@ -1,3 +1,4 @@
+from formatacao import formatar_moeda
 from modelos.mesa import Mesa
 from modelos.pedido import Pedido
 from modelos.pagamento import Pagamento
@@ -132,7 +133,7 @@ class Atendimento:
         situacao_mesa = "Bloqueada" if self.__mesa.bloqueada else "Desbloqueada"
         return (
             f"Mesa {self.__mesa.numero} ({situacao_mesa}) | {status} | "
-            f"Total: R$ {self.total:.2f} | "
-            f"Pago: R$ {self.total_pago:.2f} | "
-            f"Saldo: R$ {self.saldo:.2f}"
+            f"Total: {formatar_moeda(self.total)} | "
+            f"Pago: {formatar_moeda(self.total_pago)} | "
+            f"Saldo: {formatar_moeda(self.saldo)}"
         )

@@ -30,7 +30,11 @@ O sistema também permite **bloquear e desbloquear mesas**. Uma mesa bloqueada n
 
 ### 🪑 Mesas
 - Cadastrar mesas;
-- Listar mesas (exibindo a situação: bloqueada ou desbloqueada);
+- Exibir automaticamente a situação de todas as mesas ao abrir o Menu de Mesas:
+  - `Mesa 1 - Disponível`
+  - `Mesa 2 - Ocupada - Total: R$ 35,00 - Pago: R$ 20,00`
+  - `Mesa 3 - Indisponível (bloqueada)`
+- Listar mesas (mesma listagem, com total e valor pago das mesas ocupadas);
 - Consultar disponibilidade (situação de bloqueio e de ocupação);
 - Bloquear uma mesa cadastrada;
 - Desbloquear uma mesa anteriormente bloqueada;
@@ -44,6 +48,7 @@ O sistema também permite **bloquear e desbloquear mesas**. Uma mesa bloqueada n
 - Trabalhar com diferentes tipos de produtos utilizando herança e polimorfismo.
 
 ### 🧾 Atendimentos
+- Exibir, antes das opções do Menu de Atendimento, o total geral dos atendimentos e o total geral dos pagamentos registrados;
 - Abrir atendimento (somente em mesas desbloqueadas e livres, informando o motivo quando a abertura é recusada);
 - Consultar uma comanda;
 - Registrar pedidos;
@@ -70,6 +75,7 @@ RegistroDeComandas/
 ├── main.py
 ├── lanchonete.py
 ├── aplicacao.py
+├── formatacao.py
 │
 ├── dados/                  (arquivos JSON gerados automaticamente)
 │
@@ -176,6 +182,9 @@ Mesas
 - A abertura de comandas só é permitida em mesas desbloqueadas e livres.
 - O bloqueio de uma mesa não apaga nem altera as comandas já existentes (pedidos, pagamentos e histórico permanecem intactos).
 - A situação da mesa (bloqueada ou desbloqueada) é exibida nas listagens e consultas.
+- Mesa bloqueada e sem atendimento é exibida como `Indisponível (bloqueada)`.
+- Mesas ocupadas exibem o total e o valor já pago do atendimento atual, calculados a partir dos dados registrados.
+- Os totais gerais consideram todos os atendimentos registrados (abertos e encerrados).
 
 Atendimentos
 - Não é permitido registrar pedidos em um atendimento encerrado.

@@ -1,5 +1,7 @@
 from abc import ABC, abstractmethod
 
+from formatacao import formatar_moeda
+
 
 class Produto(ABC):
     """
@@ -93,7 +95,7 @@ class Produto(ABC):
         status = "Disponível" if self.__disponivel else "Indisponível"
         return (
             f"{self.descricao()} | Código: {self.__codigo} | "
-            f"R$ {self.__preco:.2f} | {status}"
+            f"{formatar_moeda(self.__preco)} | {status}"
         )
 
 

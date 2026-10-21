@@ -1,7 +1,9 @@
 from interface.tela import Tela
 from modelos.mesa import Mesa
 from lanchonete import Lanchonete
+from formatacao import formatar_moeda
 from excecoes.lanchonete_error import (
+    AtendimentoNaoEncontradoError,
     MesaJaBloqueadaError,
     MesaJaDesbloqueadaError,
 )
@@ -41,9 +43,33 @@ class TelaMesas(Tela):
             print("Nenhuma mesa cadastrada.")
             return
 
-        print("\n--- Mesas ---")
+        print("\n--- Situação das mesas ---")
         for mesa in mesas:
-            print(mesa)
+            print(self._descrever_mesa(mesa))
+
+    def _descrever_mesa(self, mesa: Mesa) -> str:
+        """Monta a linha de situação da mesa.
+
+        - Disponível: mesa livre e desbloqueada;
+        - Ocupada: exibe total e valor já pago do atendimento atual;
+        - Indisponível (bloqueada): mesa bloqueada e sem atendimento.
+        """
+        if mesa.ocupada:
+            situacao = "Ocupada (bloqueada)" if mesa.bloqueada else "Ocupada"
+            try:
+                atendimento = self.__lanchonete.localizar_atendimento(mesa)
+            except AtendimentoNaoEncontradoError:
+                return f"Mesa {mesa.numero} - {situacao}"
+            return (
+                f"Mesa {mesa.numero} - {situacao} - "
+                f"Total: {formatar_moeda(atendimento.total)} - "
+                f"Pago: {formatar_moeda(atendimento.total_pago)}"
+            )
+
+        if mesa.bloqueada:
+            return f"Mesa {mesa.numero} - Indisponível (bloqueada)"
+
+        return f"Mesa {mesa.numero} - Disponível"
 
     def consultar_disponibilidade(self) -> None:
         numero = _ler_int("Número da mesa: ")

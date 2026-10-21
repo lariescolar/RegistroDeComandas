@@ -1,3 +1,6 @@
+from formatacao import formatar_moeda
+
+
 class Pagamento:
     """Representa um pagamento realizado pelo cliente."""
 
@@ -27,4 +30,4 @@ class Pagamento:
         )
 
     def __str__(self) -> str:
-        return f"R$ {self.__valor:.2f}"
+        return formatar_moeda(self.__valor)

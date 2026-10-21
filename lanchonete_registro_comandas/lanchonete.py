@@ -98,6 +98,16 @@ class Lanchonete:
     def atendimentos(self) -> list[Atendimento]:
         return self.__atendimentos.copy()
 
+    @property
+    def total_geral_atendimentos(self) -> float:
+        """Valor total de todos os atendimentos registrados (abertos e encerrados)."""
+        return round(sum(a.total for a in self.__atendimentos), 2)
+
+    @property
+    def total_geral_pagamentos(self) -> float:
+        """Valor total de todos os pagamentos registrados."""
+        return round(sum(a.total_pago for a in self.__atendimentos), 2)
+
     def adicionar_mesa(self, mesa: Mesa) -> None:
         self.__mesas.append(mesa)
         self.salvar_dados()

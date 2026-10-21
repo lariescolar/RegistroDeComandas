@@ -11,7 +11,10 @@ class MenuAtendimentos(Menu):
 
     def executar(self) -> None:
         while True:
-            print("\n===== Menu de Atendimentos =====")
+            print("\n" + "=" * 40)
+            print("MENU DE ATENDIMENTO")
+            print("=" * 40)
+            self.__tela.exibir_totais_gerais()
             print("1 - Abrir atendimento")
             print("2 - Consultar atendimento")
             print("3 - Registrar pedido")

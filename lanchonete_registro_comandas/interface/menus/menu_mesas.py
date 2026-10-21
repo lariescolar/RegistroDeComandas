@@ -12,6 +12,8 @@ class MenuMesas(Menu):
     def executar(self) -> None:
         while True:
             print("\n===== Menu de Mesas =====")
+            self.__tela.listar_mesas()
+            print()
             print("1 - Cadastrar mesa")
             print("2 - Listar mesas")
             print("3 - Consultar disponibilidade")
