@@ -5,6 +5,7 @@ from lanchonete import Lanchonete
 from excecoes.lanchonete_error import (
     AtendimentoNaoEncontradoError,
     AtendimentoNaoQuitadoError,
+    MesaBloqueadaError,
     MesaOcupadaError,
     PagamentoInvalidoError,
     ProdutoNaoEncontradoError,
@@ -53,6 +54,8 @@ class TelaAtendimentos(Tela):
         try:
             self.__lanchonete.abrir_atendimento(mesa)
             print(f"Atendimento aberto para a mesa {mesa.numero}.")
+        except MesaBloqueadaError as exc:
+            print(exc)
         except MesaOcupadaError as exc:
             print(exc)
 

@@ -7,6 +7,7 @@ from excecoes.lanchonete_error import (
     AtendimentoEncerradoError,
     AtendimentoNaoEncontradoError,
     AtendimentoNaoQuitadoError,
+    MesaBloqueadaError,
     MesaOcupadaError,
     PagamentoInvalidoError,
 )
@@ -22,6 +23,11 @@ class AtendimentoService:
 
     def abrir_atendimento(self, mesa: Mesa) -> Atendimento:
         """Abre um novo atendimento para a mesa informada."""
+        if mesa.bloqueada:
+            raise MesaBloqueadaError(
+                "Não é possível abrir uma comanda em uma mesa bloqueada."
+            )
+
         if mesa.ocupada:
             raise MesaOcupadaError("A mesa já possui um atendimento em andamento.")
 

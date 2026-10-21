@@ -26,3 +26,11 @@ class MesaService:
     def listar_mesas(self) -> list[Mesa]:
         """Retorna a lista de mesas cadastradas."""
         return self.__aplicacao.mesas
+
+    def bloquear_mesa(self, mesa: Mesa) -> None:
+        """Bloqueia uma mesa cadastrada."""
+        mesa.bloquear()
+
+    def desbloquear_mesa(self, mesa: Mesa) -> None:
+        """Desbloqueia uma mesa cadastrada."""
+        mesa.desbloquear()

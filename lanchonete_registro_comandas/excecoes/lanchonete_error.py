@@ -8,6 +8,21 @@ class MesaOcupadaError(LanchoneteError):
     pass
 
 
+class MesaBloqueadaError(LanchoneteError):
+    """Indica que a mesa está bloqueada."""
+    pass
+
+
+class MesaJaBloqueadaError(LanchoneteError):
+    """Indica que a mesa já está bloqueada."""
+    pass
+
+
+class MesaJaDesbloqueadaError(LanchoneteError):
+    """Indica que a mesa já está desbloqueada."""
+    pass
+
+
 class AtendimentoEncerradoError(LanchoneteError):
     """Indica que o atendimento já foi encerrado."""
     pass

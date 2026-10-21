@@ -20,7 +20,9 @@ Durante um atendimento, é possível registrar os produtos consumidos, acompanha
 
 Após a quitação da conta, o atendimento pode ser encerrado e a mesa volta a ficar disponível. Os atendimentos encerrados permanecem registrados para consulta do histórico.
 
-Os dados são mantidos **em memória durante a execução do programa**.
+Os dados são **persistidos em arquivos JSON** (pasta `dados/`), sendo carregados ao iniciar o programa e salvos a cada alteração.
+
+O sistema também permite **bloquear e desbloquear mesas**. Uma mesa bloqueada não pode receber novas comandas, e o bloqueio nunca apaga nem altera os registros das comandas já existentes.
 
 ---
 
@@ -28,8 +30,10 @@ Os dados são mantidos **em memória durante a execução do programa**.
 
 ### 🪑 Mesas
 - Cadastrar mesas;
-- Listar mesas;
-- Consultar disponibilidade;
+- Listar mesas (exibindo a situação: bloqueada ou desbloqueada);
+- Consultar disponibilidade (situação de bloqueio e de ocupação);
+- Bloquear uma mesa cadastrada;
+- Desbloquear uma mesa anteriormente bloqueada;
 - Ocupar uma mesa ao abrir um atendimento;
 - Liberar a mesa após o encerramento.
 
@@ -40,7 +44,7 @@ Os dados são mantidos **em memória durante a execução do programa**.
 - Trabalhar com diferentes tipos de produtos utilizando herança e polimorfismo.
 
 ### 🧾 Atendimentos
-- Abrir atendimento;
+- Abrir atendimento (somente em mesas desbloqueadas e livres, informando o motivo quando a abertura é recusada);
 - Consultar uma comanda;
 - Registrar pedidos;
 - Consultar o consumo;
@@ -65,6 +69,9 @@ RegistroDeComandas/
 │
 ├── main.py
 ├── lanchonete.py
+├── aplicacao.py
+│
+├── dados/                  (arquivos JSON gerados automaticamente)
 │
 ├── modelos/
 │   ├── __init__.py
@@ -76,8 +83,24 @@ RegistroDeComandas/
 │
 ├── excecoes/
 │   ├── __init__.py
-│   ├── lanchonete_error.py
-│   └── ...
+│   └── lanchonete_error.py
+│
+├── persistencia/
+│   ├── __init__.py
+│   ├── base_persistencia.py
+│   ├── mesa_persistencia.py
+│   ├── produto_persistencia.py
+│   ├── pedido_persistencia.py
+│   ├── pagamento_persistencia.py
+│   └── atendimento_persistencia.py
+│
+├── servicos/
+│   ├── __init__.py
+│   ├── mesa_service.py
+│   ├── produto_service.py
+│   ├── atendimento_service.py
+│   ├── pedido_service.py
+│   └── pagamento_service.py
 │
 └── interface/
     ├── __init__.py
@@ -146,6 +169,13 @@ Esses valores são calculados a partir dos objetos existentes e não são armaze
 Mesas
 - Não é permitido abrir dois atendimentos simultaneamente para a mesma mesa.
 - Uma mesa ocupada não pode receber um novo atendimento.
+- Somente mesas cadastradas podem ser bloqueadas ou desbloqueadas.
+- Uma mesa já bloqueada não pode ser bloqueada novamente (mensagem de erro adequada).
+- Uma mesa já desbloqueada não pode ser desbloqueada novamente (mensagem de erro adequada).
+- Não é permitido abrir uma nova comanda em uma mesa bloqueada; a recusa informa o motivo.
+- A abertura de comandas só é permitida em mesas desbloqueadas e livres.
+- O bloqueio de uma mesa não apaga nem altera as comandas já existentes (pedidos, pagamentos e histórico permanecem intactos).
+- A situação da mesa (bloqueada ou desbloqueada) é exibida nas listagens e consultas.
 
 Atendimentos
 - Não é permitido registrar pedidos em um atendimento encerrado.
@@ -170,12 +200,18 @@ O projeto possui uma hierarquia de exceções baseada em LanchoneteError.
 LanchoneteError
 │
 ├── MesaOcupadaError
+├── MesaBloqueadaError
+├── MesaJaBloqueadaError
+├── MesaJaDesbloqueadaError
 ├── AtendimentoEncerradoError
 ├── AtendimentoNaoEncontradoError
 ├── ProdutoNaoEncontradoError
 ├── QuantidadeInvalidaError
 ├── PagamentoInvalidoError
-└── AtendimentoNaoQuitadoError
+├── AtendimentoNaoQuitadoError
+└── PersistenciaError
+    ├── ArquivoCorrompidoError
+    └── RelacionamentoInvalidoError
 ```
 As exceções são utilizadas para impedir operações que violem as regras de negócio do sistema.
 
@@ -210,6 +246,7 @@ erDiagram
     MESA {
         int numero PK
         bool ocupada
+        bool bloqueada
     }
 
     ATENDIMENTO {
@@ -266,7 +303,9 @@ python main.py
 ```
 Cadastrar mesas e produtos
           ↓
-Abrir atendimento
+Bloquear / desbloquear mesas (se necessário)
+          ↓
+Abrir atendimento (somente em mesa desbloqueada e livre)
           ↓
 Registrar pedidos
           ↓

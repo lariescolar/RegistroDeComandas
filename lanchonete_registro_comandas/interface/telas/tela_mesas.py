@@ -1,6 +1,10 @@
 from interface.tela import Tela
 from modelos.mesa import Mesa
 from lanchonete import Lanchonete
+from excecoes.lanchonete_error import (
+    MesaJaBloqueadaError,
+    MesaJaDesbloqueadaError,
+)
 
 
 def _ler_int(mensagem: str) -> int:
@@ -49,5 +53,41 @@ class TelaMesas(Tela):
             print("Mesa não encontrada.")
             return
 
-        status = "ocupada" if mesa.ocupada else "disponível"
-        print(f"A mesa {mesa.numero} está {status}.")
+        status = "bloqueada" if mesa.bloqueada else "desbloqueada"
+        ocupacao = "ocupada" if mesa.ocupada else "livre"
+        print(f"A mesa {mesa.numero} está {status} e {ocupacao}.")
+
+        if mesa.bloqueada:
+            print("Situação: não pode receber novas comandas enquanto estiver bloqueada.")
+        elif mesa.ocupada:
+            print("Situação: não pode receber nova comanda, pois já possui uma em andamento.")
+        else:
+            print("Situação: disponível para abertura de comanda.")
+
+    def bloquear_mesa(self) -> None:
+        numero = _ler_int("Número da mesa: ")
+        mesa = self.__lanchonete.localizar_mesa(numero)
+
+        if mesa is None:
+            print("Mesa não encontrada.")
+            return
+
+        try:
+            self.__lanchonete.bloquear_mesa(mesa)
+            print("Mesa bloqueada com sucesso.")
+        except MesaJaBloqueadaError as exc:
+            print(exc)
+
+    def desbloquear_mesa(self) -> None:
+        numero = _ler_int("Número da mesa: ")
+        mesa = self.__lanchonete.localizar_mesa(numero)
+
+        if mesa is None:
+            print("Mesa não encontrada.")
+            return
+
+        try:
+            self.__lanchonete.desbloquear_mesa(mesa)
+            print("Mesa desbloqueada com sucesso.")
+        except MesaJaDesbloqueadaError as exc:
+            print(exc)

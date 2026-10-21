@@ -6,6 +6,7 @@ from modelos.pagamento import Pagamento
 
 from excecoes.lanchonete_error import (
     AtendimentoNaoEncontradoError,
+    MesaBloqueadaError,
     MesaOcupadaError,
     ProdutoNaoEncontradoError,
 )
@@ -97,13 +98,19 @@ class Lanchonete:
     def atendimentos(self) -> list[Atendimento]:
         return self.__atendimentos.copy()
 
-    def cadastrar_mesa(self, mesa: Mesa) -> None:
+    def adicionar_mesa(self, mesa: Mesa) -> None:
         self.__mesas.append(mesa)
         self.salvar_dados()
 
-    def cadastrar_produto(self, produto: Produto) -> None:
+    def cadastrar_mesa(self, mesa: Mesa) -> None:
+        self.adicionar_mesa(mesa)
+
+    def adicionar_produto(self, produto: Produto) -> None:
         self.__produtos.append(produto)
         self.salvar_dados()
+
+    def cadastrar_produto(self, produto: Produto) -> None:
+        self.adicionar_produto(produto)
 
     def localizar_mesa(self, numero: int) -> Mesa | None:
         for mesa in self.__mesas:
@@ -117,7 +124,20 @@ class Lanchonete:
                 return produto
         raise ProdutoNaoEncontradoError("Produto não encontrado.")
 
+    def bloquear_mesa(self, mesa: Mesa) -> None:
+        mesa.bloquear()
+        self.salvar_dados()
+
+    def desbloquear_mesa(self, mesa: Mesa) -> None:
+        mesa.desbloquear()
+        self.salvar_dados()
+
     def abrir_atendimento(self, mesa: Mesa) -> Atendimento:
+        if mesa.bloqueada:
+            raise MesaBloqueadaError(
+                "Não é possível abrir uma comanda em uma mesa bloqueada."
+            )
+
         if mesa.ocupada:
             raise MesaOcupadaError("A mesa já está ocupada.")
 

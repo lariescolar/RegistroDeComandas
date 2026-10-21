@@ -42,15 +42,22 @@ class Atendimento:
 
     @property
     def total(self) -> float:
-        return sum(pedido.valor for pedido in self.__pedidos)
+        """Soma dos valores dos pedidos, arredondada em centavos."""
+        return round(sum(pedido.valor for pedido in self.__pedidos), 2)
 
     @property
     def total_pago(self) -> float:
-        return sum(pagamento.valor for pagamento in self.__pagamentos)
+        """Soma dos valores dos pagamentos, arredondada em centavos."""
+        return round(sum(pagamento.valor for pagamento in self.__pagamentos), 2)
 
     @property
     def saldo(self) -> float:
-        return self.total - self.total_pago
+        """Total menos o total pago, arredondado em centavos.
+
+        O arredondamento evita que erros de ponto flutuante (ex.: 5.5e-17)
+        sejam interpretados como saldo pendente.
+        """
+        return round(self.total - self.total_pago, 2)
 
     def adicionar_pedido(self, pedido: Pedido) -> None:
         if self.__encerrado:
@@ -122,8 +129,9 @@ class Atendimento:
 
     def __str__(self) -> str:
         status = "Encerrado" if self.__encerrado else "Em aberto"
+        situacao_mesa = "Bloqueada" if self.__mesa.bloqueada else "Desbloqueada"
         return (
-            f"Mesa {self.__mesa.numero} | {status} | "
+            f"Mesa {self.__mesa.numero} ({situacao_mesa}) | {status} | "
             f"Total: R$ {self.total:.2f} | "
             f"Pago: R$ {self.total_pago:.2f} | "
             f"Saldo: R$ {self.saldo:.2f}"
