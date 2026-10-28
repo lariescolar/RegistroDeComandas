@@ -1,11 +1,10 @@
 from interface.tela import Tela
 from modelos.mesa import Mesa
-from lanchonete import Lanchonete
+from aplicacao import Aplicacao
 from formatacao import formatar_moeda
 from excecoes.lanchonete_error import (
     AtendimentoNaoEncontradoError,
-    MesaJaBloqueadaError,
-    MesaJaDesbloqueadaError,
+    LanchoneteError,
 )
 
 
@@ -20,8 +19,8 @@ def _ler_int(mensagem: str) -> int:
 class TelaMesas(Tela):
     """Tela responsável pelas operações relacionadas às mesas."""
 
-    def __init__(self, lanchonete: Lanchonete) -> None:
-        self.__lanchonete = lanchonete
+    def __init__(self, aplicacao: Aplicacao) -> None:
+        self.__aplicacao = aplicacao
 
     def exibir(self) -> None:
         self.listar_mesas()
@@ -29,15 +28,14 @@ class TelaMesas(Tela):
     def cadastrar_mesa(self) -> None:
         numero = _ler_int("Número da mesa: ")
 
-        if self.__lanchonete.localizar_mesa(numero) is not None:
-            print("Essa mesa já foi cadastrada.")
-            return
-
-        self.__lanchonete.cadastrar_mesa(Mesa(numero))
-        print("Mesa cadastrada com sucesso.")
+        try:
+            self.__aplicacao.mesa_service.cadastrar_mesa(numero)
+            print("Mesa cadastrada com sucesso.")
+        except LanchoneteError as exc:
+            print(exc)
 
     def listar_mesas(self) -> None:
-        mesas = self.__lanchonete.mesas
+        mesas = self.__aplicacao.mesa_service.listar_mesas()
 
         if not mesas:
             print("Nenhuma mesa cadastrada.")
@@ -57,7 +55,9 @@ class TelaMesas(Tela):
         if mesa.ocupada:
             situacao = "Ocupada (bloqueada)" if mesa.bloqueada else "Ocupada"
             try:
-                atendimento = self.__lanchonete.localizar_atendimento(mesa)
+                atendimento = (
+                    self.__aplicacao.atendimento_service.localizar_atendimento(mesa)
+                )
             except AtendimentoNaoEncontradoError:
                 return f"Mesa {mesa.numero} - {situacao}"
             return (
@@ -73,7 +73,7 @@ class TelaMesas(Tela):
 
     def consultar_disponibilidade(self) -> None:
         numero = _ler_int("Número da mesa: ")
-        mesa = self.__lanchonete.localizar_mesa(numero)
+        mesa = self.__aplicacao.mesa_service.localizar_mesa(numero)
 
         if mesa is None:
             print("Mesa não encontrada.")
@@ -92,28 +92,28 @@ class TelaMesas(Tela):
 
     def bloquear_mesa(self) -> None:
         numero = _ler_int("Número da mesa: ")
-        mesa = self.__lanchonete.localizar_mesa(numero)
+        mesa = self.__aplicacao.mesa_service.localizar_mesa(numero)
 
         if mesa is None:
             print("Mesa não encontrada.")
             return
 
         try:
-            self.__lanchonete.bloquear_mesa(mesa)
+            self.__aplicacao.mesa_service.bloquear_mesa(mesa)
             print("Mesa bloqueada com sucesso.")
-        except MesaJaBloqueadaError as exc:
+        except LanchoneteError as exc:
             print(exc)
 
     def desbloquear_mesa(self) -> None:
         numero = _ler_int("Número da mesa: ")
-        mesa = self.__lanchonete.localizar_mesa(numero)
+        mesa = self.__aplicacao.mesa_service.localizar_mesa(numero)
 
         if mesa is None:
             print("Mesa não encontrada.")
             return
 
         try:
-            self.__lanchonete.desbloquear_mesa(mesa)
+            self.__aplicacao.mesa_service.desbloquear_mesa(mesa)
             print("Mesa desbloqueada com sucesso.")
-        except MesaJaDesbloqueadaError as exc:
+        except LanchoneteError as exc:
             print(exc)

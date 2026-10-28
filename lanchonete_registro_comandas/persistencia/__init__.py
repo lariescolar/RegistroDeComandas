@@ -1,17 +1,5 @@
-"""Pacote responsável pela camada de persistência em arquivos JSON."""
+"""Pacote responsável pela configuração do banco de dados (SQLAlchemy)."""
 
-from .base_persistencia import BasePersistencia
-from .produto_persistencia import ProdutoPersistencia
-from .mesa_persistencia import MesaPersistencia
-from .pedido_persistencia import PedidoPersistencia
-from .pagamento_persistencia import PagamentoPersistencia
-from .atendimento_persistencia import AtendimentoPersistencia
+from .banco import engine, criar_tabelas, criar_sessao
 
-__all__ = [
-    "BasePersistencia",
-    "ProdutoPersistencia",
-    "MesaPersistencia",
-    "PedidoPersistencia",
-    "PagamentoPersistencia",
-    "AtendimentoPersistencia",
-]
+__all__ = ["engine", "criar_tabelas", "criar_sessao"]

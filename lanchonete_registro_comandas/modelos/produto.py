@@ -1,106 +1,64 @@
-from abc import ABC, abstractmethod
+from sqlalchemy import Float, String
+from sqlalchemy.orm import Mapped, mapped_column
 
 from formatacao import formatar_moeda
+from modelos.base import Base
 
 
-class Produto(ABC):
+class Produto(Base):
     """
     Representa um produto comercializado pela lanchonete.
-    Classe base para os diferentes tipos de produtos.
+
+    Classe base (conceitualmente abstrata) dos tipos de produto: não deve
+    ser instanciada diretamente, apenas suas subclasses (Suco, Sanduiche).
+
+    Os produtos usam herança de tabela única: todas as subclasses são
+    gravadas na tabela "produtos", diferenciadas pela coluna "tipo".
     """
 
-    def __init__(
-        self,
-        codigo: int,
-        nome: str,
-        preco: float,
-        disponivel: bool = True
-    ) -> None:
-        """
-        Inicializa um produto.
+    __tablename__ = "produtos"
 
-        Args:
-            codigo: Código de identificação do produto.
-            nome: Nome do produto.
-            preco: Preço do produto.
-            disponivel: Indica se o produto está disponível para venda.
-        """
-        self.__codigo: int = codigo
-        self.__nome: str = nome
-        self.__preco: float = preco
-        self.__disponivel: bool = disponivel
+    # O código do produto é informado pelo usuário e identifica o produto.
+    codigo: Mapped[int] = mapped_column(
+        primary_key=True,
+        autoincrement=False
+    )
 
-    @property
-    def codigo(self) -> int:
-        """Retorna o código do produto."""
-        return self.__codigo
+    nome: Mapped[str] = mapped_column(String(100))
 
-    @property
-    def nome(self) -> str:
-        """Retorna o nome do produto."""
-        return self.__nome
+    preco: Mapped[float] = mapped_column(Float)
 
-    @property
-    def preco(self) -> float:
-        """Retorna o preço do produto."""
-        return self.__preco
+    disponivel: Mapped[bool] = mapped_column(default=True)
 
-    @property
-    def disponivel(self) -> bool:
-        """Retorna a disponibilidade do produto."""
-        return self.__disponivel
+    tipo: Mapped[str] = mapped_column(String(30))
+
+    __mapper_args__ = {
+        "polymorphic_on": "tipo",
+        "polymorphic_identity": "Produto",
+    }
 
     def alterar_disponibilidade(self, disponivel: bool) -> None:
-        """
-        Altera a disponibilidade do produto.
+        """Altera a disponibilidade do produto."""
+        self.disponivel = disponivel
 
-        Args:
-            disponivel: Nova situação de disponibilidade do produto.
-        """
-        self.__disponivel = disponivel
-
-    @abstractmethod
     def descricao(self) -> str:
-        """
-        Retorna uma descrição específica do tipo de produto.
-
-        Este método deverá ser implementado pelas subclasses.
-        """
-        pass
-
-    def to_dict(self) -> dict:
-        """Converte a instância em um dicionário para persistência em JSON."""
-        return {
-            "codigo": self.__codigo,
-            "nome": self.__nome,
-            "preco": self.__preco,
-            "disponivel": self.__disponivel,
-            "tipo": self.__class__.__name__,
-        }
-
-    @classmethod
-    def from_dict(cls, dados: dict) -> "Produto":
-        """Reconstrói uma instância concreta de Produto a partir de um dicionário."""
-        tipo = dados.get("tipo", "")
-        codigo = int(dados["codigo"])
-        nome = str(dados["nome"])
-        preco = float(dados["preco"])
-        disponivel = bool(dados.get("disponivel", True))
-
-        if tipo == "Sanduiche":
-            return Sanduiche(codigo=codigo, nome=nome, preco=preco, disponivel=disponivel)
-        return Suco(codigo=codigo, nome=nome, preco=preco, disponivel=disponivel)
+        """Retorna a descrição do tipo de produto (implementada nas subclasses)."""
+        raise NotImplementedError(
+            "As subclasses de Produto devem implementar descricao()."
+        )
 
     def __str__(self) -> str:
-        status = "Disponível" if self.__disponivel else "Indisponível"
+        status = "Disponível" if self.disponivel else "Indisponível"
         return (
-            f"{self.descricao()} | Código: {self.__codigo} | "
-            f"{formatar_moeda(self.__preco)} | {status}"
+            f"{self.descricao()} | Código: {self.codigo} | "
+            f"{formatar_moeda(self.preco)} | {status}"
         )
 
 
 class Suco(Produto):
     """Representa um suco vendido pela lanchonete."""
+
+    __mapper_args__ = {"polymorphic_identity": "Suco"}
 
     def descricao(self) -> str:
         """Retorna a descrição do suco."""
@@ -109,6 +67,8 @@ class Suco(Produto):
 
 class Sanduiche(Produto):
     """Representa um sanduíche vendido pela lanchonete."""
+
+    __mapper_args__ = {"polymorphic_identity": "Sanduiche"}
 
     def descricao(self) -> str:
         """Retorna a descrição do sanduíche."""

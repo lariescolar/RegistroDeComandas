@@ -1,66 +1,52 @@
+from sqlalchemy import ForeignKey
+from sqlalchemy.orm import Mapped, mapped_column, relationship, validates
+
 from formatacao import formatar_moeda
-from modelos.produto import Produto
+from modelos.base import Base
 from excecoes.lanchonete_error import QuantidadeInvalidaError
 
 
-class Pedido:
-    """
-    Representa um produto solicitado durante um atendimento.
-    """
+class Pedido(Base):
+    """Representa um produto solicitado durante um atendimento."""
 
-    def __init__(
-        self,
-        produto: Produto,
-        quantidade: int,
-        id_pedido: int | None = None
-    ) -> None:
-        if quantidade <= 0:
+    __tablename__ = "pedidos"
+
+    id: Mapped[int] = mapped_column(
+        primary_key=True,
+        autoincrement=True
+    )
+
+    atendimento_id: Mapped[int] = mapped_column(
+        ForeignKey("atendimentos.id")
+    )
+
+    produto_codigo: Mapped[int] = mapped_column(
+        ForeignKey("produtos.codigo")
+    )
+
+    quantidade: Mapped[int]
+
+    atendimento: Mapped["Atendimento"] = relationship(
+        back_populates="pedidos"
+    )
+
+    produto: Mapped["Produto"] = relationship()
+
+    @validates("quantidade")
+    def _validar_quantidade(self, chave: str, valor: int) -> int:
+        """Regra de negócio: a quantidade deve ser maior que zero."""
+        if valor is None or valor <= 0:
             raise QuantidadeInvalidaError(
                 "A quantidade deve ser maior que zero."
             )
-
-        self.__id: int | None = id_pedido
-        self.__produto: Produto = produto
-        self.__quantidade: int = quantidade
-
-    @property
-    def id(self) -> int | None:
-        return self.__id
-
-    @property
-    def produto(self) -> Produto:
-        return self.__produto
-
-    @property
-    def quantidade(self) -> int:
-        return self.__quantidade
+        return valor
 
     @property
     def valor(self) -> float:
-        return self.__produto.preco * self.__quantidade
-
-    def to_dict(self) -> dict:
-        codigo_produto = getattr(
-            self.__produto,
-            "codigo",
-            getattr(self.__produto, "id", None)
-        )
-        return {
-            "id": self.__id,
-            "codigo_produto": codigo_produto,
-            "quantidade": self.__quantidade,
-        }
-
-    @classmethod
-    def from_dict(cls, dados: dict, produto: Produto) -> "Pedido":
-        return cls(
-            produto=produto,
-            quantidade=int(dados["quantidade"]),
-            id_pedido=dados.get("id"),
-        )
+        return self.produto.preco * self.quantidade
 
     def __str__(self) -> str:
         return (
-            f"{self.__produto.nome} x {self.__quantidade} - "
+            f"{self.produto.nome} x {self.quantidade} - "
             f"{formatar_moeda(self.valor)}"
         )

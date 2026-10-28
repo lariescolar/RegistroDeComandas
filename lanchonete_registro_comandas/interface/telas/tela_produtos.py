@@ -1,6 +1,7 @@
 from interface.tela import Tela
-from modelos.produto import Produto, Suco, Sanduiche
-from lanchonete import Lanchonete
+from modelos.produto import Suco, Sanduiche
+from aplicacao import Aplicacao
+from excecoes.lanchonete_error import LanchoneteError
 
 
 def _ler_int(mensagem: str) -> int:
@@ -22,8 +23,8 @@ def _ler_float(mensagem: str) -> float:
 class TelaProdutos(Tela):
     """Tela responsável pelas operações relacionadas aos produtos."""
 
-    def __init__(self, lanchonete: Lanchonete) -> None:
-        self.__lanchonete = lanchonete
+    def __init__(self, aplicacao: Aplicacao) -> None:
+        self.__aplicacao = aplicacao
 
     def exibir(self) -> None:
         self.listar_produtos()
@@ -38,18 +39,23 @@ class TelaProdutos(Tela):
         disponivel = disponivel_resposta in {"s", "sim", "y", "yes"}
 
         if tipo == "1":
-            produto: Produto = Suco(codigo, nome, preco, disponivel)
+            classe = Suco
         elif tipo == "2":
-            produto = Sanduiche(codigo, nome, preco, disponivel)
+            classe = Sanduiche
         else:
             print("Tipo de produto inválido.")
             return
 
-        self.__lanchonete.cadastrar_produto(produto)
-        print("Produto cadastrado com sucesso.")
+        try:
+            self.__aplicacao.produto_service.cadastrar_produto(
+                classe, codigo, nome, preco, disponivel
+            )
+            print("Produto cadastrado com sucesso.")
+        except LanchoneteError as exc:
+            print(exc)
 
     def listar_produtos(self) -> None:
-        produtos = self.__lanchonete.produtos
+        produtos = self.__aplicacao.produto_service.listar_produtos()
 
         if not produtos:
             print("Nenhum produto cadastrado.")
@@ -63,8 +69,8 @@ class TelaProdutos(Tela):
         codigo = _ler_int("Código do produto: ")
 
         try:
-            produto = self.__lanchonete.localizar_produto(codigo)
-        except Exception as exc:
+            produto = self.__aplicacao.produto_service.localizar_produto(codigo)
+        except LanchoneteError as exc:
             print(exc)
             return
 

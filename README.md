@@ -20,7 +20,7 @@ Durante um atendimento, é possível registrar os produtos consumidos, acompanha
 
 Após a quitação da conta, o atendimento pode ser encerrado e a mesa volta a ficar disponível. Os atendimentos encerrados permanecem registrados para consulta do histórico.
 
-Os dados são **persistidos em arquivos JSON** (pasta `dados/`), sendo carregados ao iniciar o programa e salvos a cada alteração.
+Os dados são **persistidos em um banco de dados SQLite** (`dados/lanchonete.db`) por meio do **SQLAlchemy ORM**. Os registros permanecem salvos após o encerramento do programa e cada alteração é confirmada no banco (`commit`) pelos serviços.
 
 O sistema também permite **bloquear e desbloquear mesas**. Uma mesa bloqueada não pode receber novas comandas, e o bloqueio nunca apaga nem altera os registros das comandas já existentes.
 
@@ -72,59 +72,57 @@ O sistema também permite **bloquear e desbloquear mesas**. Uma mesa bloqueada n
 ```
 RegistroDeComandas/
 │
-├── main.py
-├── lanchonete.py
-├── aplicacao.py
-├── formatacao.py
+├── .gitignore
+├── README.md
 │
-├── dados/                  (arquivos JSON gerados automaticamente)
-│
-├── modelos/
-│   ├── __init__.py
-│   ├── mesa.py
-│   ├── atendimento.py
-│   ├── produto.py
-│   ├── pedido.py
-│   └── pagamento.py
-│
-├── excecoes/
-│   ├── __init__.py
-│   └── lanchonete_error.py
-│
-├── persistencia/
-│   ├── __init__.py
-│   ├── base_persistencia.py
-│   ├── mesa_persistencia.py
-│   ├── produto_persistencia.py
-│   ├── pedido_persistencia.py
-│   ├── pagamento_persistencia.py
-│   └── atendimento_persistencia.py
-│
-├── servicos/
-│   ├── __init__.py
-│   ├── mesa_service.py
-│   ├── produto_service.py
-│   ├── atendimento_service.py
-│   ├── pedido_service.py
-│   └── pagamento_service.py
-│
-└── interface/
-    ├── __init__.py
-    ├── menu.py
-    ├── tela.py
+└── lanchonete_registro_comandas/
+    ├── main.py
+    ├── aplicacao.py            (sessão do banco + acesso aos serviços)
+    ├── formatacao.py
+    ├── requirements.txt
     │
-    ├── menus/
+    ├── dados/                  (lanchonete.db é gerado automaticamente)
+    │
+    ├── modelos/                (modelos ORM)
     │   ├── __init__.py
-    │   ├── menu_principal.py
-    │   ├── menu_mesas.py
-    │   ├── menu_produtos.py
-    │   └── menu_atendimentos.py
+    │   ├── base.py
+    │   ├── mesa.py
+    │   ├── atendimento.py
+    │   ├── produto.py
+    │   ├── pedido.py
+    │   └── pagamento.py
     │
-    └── telas/
+    ├── excecoes/
+    │   ├── __init__.py
+    │   └── lanchonete_error.py
+    │
+    ├── persistencia/
+    │   ├── __init__.py
+    │   └── banco.py            (engine, criar_tabelas, criar_sessao)
+    │
+    ├── servicos/
+    │   ├── __init__.py
+    │   ├── mesa_service.py
+    │   ├── produto_service.py
+    │   ├── atendimento_service.py
+    │   ├── pedido_service.py
+    │   └── pagamento_service.py
+    │
+    └── interface/
         ├── __init__.py
-        ├── tela_mesas.py
-        ├── tela_produtos.py
-        └── tela_atendimentos.py
+        ├── menu.py
+        ├── tela.py
+        ├── menus/
+        │   ├── __init__.py
+        │   ├── menu_principal.py
+        │   ├── menu_mesas.py
+        │   ├── menu_produtos.py
+        │   └── menu_atendimentos.py
+        └── telas/
+            ├── __init__.py
+            ├── tela_mesas.py
+            ├── tela_produtos.py
+            └── tela_atendimentos.py
 ```
 
 ## 🧩 Modelos
@@ -135,8 +133,19 @@ O sistema possui os seguintes modelos principais:
 - Pedido
 - Pagamento
 
-A classe Produto é abstrata e utiliza herança e polimorfismo para representar diferentes tipos de produtos.
-Os objetos se relacionam por meio de referências aos próprios objetos, mantendo a integração entre os modelos.
+Todos os modelos herdam de `Base` (SQLAlchemy `DeclarativeBase`) e são mapeados para tabelas do banco.
+
+| Modelo | Tabela | Identificador |
+| --- | --- | --- |
+| `Mesa` | `mesas` | `numero` (informado pelo usuário) |
+| `Produto` / `Suco` / `Sanduiche` | `produtos` | `codigo` (informado pelo usuário) |
+| `Atendimento` | `atendimentos` | `id` (automático) |
+| `Pedido` | `pedidos` | `id` (automático) |
+| `Pagamento` | `pagamentos` | `id` (automático) |
+
+A classe Produto é a base de uma hierarquia com **herança de tabela única**: `Suco` e `Sanduiche` são gravados na mesma tabela `produtos`, diferenciados pela coluna `tipo`, o que preserva a herança e o polimorfismo (`descricao()`). Os objetos se relacionam por meio de `relationship()` e chaves estrangeiras.
+
+Os atendimentos registram `data_abertura` (preenchida pelo banco) e `data_encerramento` (`NULL` enquanto o atendimento está em aberto). A situação de ocupação da mesa (`Mesa.ocupada`) é calculada a partir dos atendimentos em aberto, e não armazenada.
 
 ## 🔗 Relacionamentos
 
@@ -208,20 +217,23 @@ O projeto possui uma hierarquia de exceções baseada em LanchoneteError.
 ```
 LanchoneteError
 │
+├── DadoInvalidoError
 ├── MesaOcupadaError
+├── MesaJaCadastradaError
 ├── MesaBloqueadaError
 ├── MesaJaBloqueadaError
 ├── MesaJaDesbloqueadaError
 ├── AtendimentoEncerradoError
 ├── AtendimentoNaoEncontradoError
+├── AtendimentoNaoQuitadoError
 ├── ProdutoNaoEncontradoError
+├── ProdutoJaCadastradoError
+├── ProdutoIndisponivelError
 ├── QuantidadeInvalidaError
 ├── PagamentoInvalidoError
-├── AtendimentoNaoQuitadoError
 └── PersistenciaError
-    ├── ArquivoCorrompidoError
-    └── RelacionamentoInvalidoError
 ```
+
 As exceções são utilizadas para impedir operações que violem as regras de negócio do sistema.
 
 ## 🖥️ Interface
@@ -254,18 +266,14 @@ erDiagram
 
     MESA {
         int numero PK
-        bool ocupada
         bool bloqueada
     }
 
     ATENDIMENTO {
-        Mesa mesa
-        list pedidos
-        list pagamentos
-        bool encerrado
-        float total
-        float total_pago
-        float saldo
+        int id PK
+        int mesa_numero FK
+        datetime data_abertura
+        datetime data_encerramento
     }
 
     PRODUTO {
@@ -273,15 +281,19 @@ erDiagram
         string nome
         float preco
         bool disponivel
+        string tipo
     }
 
     PEDIDO {
-        Produto produto
+        int id PK
+        int atendimento_id FK
+        int produto_codigo FK
         int quantidade
-        float valor
     }
 
     PAGAMENTO {
+        int id PK
+        int atendimento_id FK
         float valor
     }
 ```
@@ -300,13 +312,31 @@ O projeto demonstra a aplicação dos seguintes conceitos de Programação Orien
 - Type Hints;
 - Docstrings;
 - Organização em módulos e pacotes;
-- Gerenciamento de dados em memória.
+- Persistência em banco de dados com ORM (SQLAlchemy);
+- Sessões, transações (`commit` / `rollback`) e context manager (`with`).
 
 ## 🚀 Execução
+
+Na pasta `lanchonete_registro_comandas`, crie e ative um ambiente virtual e instale as dependências:
+
+```
+python -m venv venv
+
+# Windows
+.\venv\Scripts\activate
+# Mac/Linux
+source venv/bin/activate
+
+pip install -r requirements.txt
+```
+
 Para executar o sistema, utilize:
+
 ```
 python main.py
 ```
+
+As tabelas são criadas automaticamente na primeira execução. Se a estrutura dos modelos for alterada durante o desenvolvimento, apague `dados/lanchonete.db` para recriá-las (os dados serão perdidos), pois `create_all()` não altera tabelas já existentes.
 
 ## 🎯 Fluxo principal
 ```
@@ -334,14 +364,23 @@ Consultar histórico
 ```
 
 ## 📁 Organização das responsabilidades
+
 ```
 MODELOS
     ↓
-Objetos e regras do domínio
+Entidades ORM, relacionamentos e regras do domínio
+
+PERSISTÊNCIA
+    ↓
+Configuração do banco (engine) e criação de sessões
+
+SERVIÇOS
+    ↓
+Operações da aplicação (consultas, commit/rollback)
 
 APLICAÇÃO
     ↓
-Coleções em memória e coordenação
+Ciclo de vida da sessão e acesso aos serviços
 
 INTERFACE
     ↓
@@ -350,3 +389,4 @@ Menus, telas e interação
 EXCEÇÕES
     ↓
 Regras que impedem operações inválidas
+```

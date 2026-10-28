@@ -1,33 +1,29 @@
+from sqlalchemy import Float, ForeignKey
+from sqlalchemy.orm import Mapped, mapped_column, relationship
+
 from formatacao import formatar_moeda
+from modelos.base import Base
 
 
-class Pagamento:
+class Pagamento(Base):
     """Representa um pagamento realizado pelo cliente."""
 
-    def __init__(self, valor: float, id_pagamento: int | None = None) -> None:
-        self.__id: int | None = id_pagamento
-        self.__valor: float = valor
+    __tablename__ = "pagamentos"
 
-    @property
-    def id(self) -> int | None:
-        return self.__id
+    id: Mapped[int] = mapped_column(
+        primary_key=True,
+        autoincrement=True
+    )
 
-    @property
-    def valor(self) -> float:
-        return self.__valor
+    atendimento_id: Mapped[int] = mapped_column(
+        ForeignKey("atendimentos.id")
+    )
 
-    def to_dict(self) -> dict:
-        return {
-            "id": self.__id,
-            "valor": self.__valor,
-        }
+    valor: Mapped[float] = mapped_column(Float)
 
-    @classmethod
-    def from_dict(cls, dados: dict) -> "Pagamento":
-        return cls(
-            valor=float(dados["valor"]),
-            id_pagamento=dados.get("id"),
-        )
+    atendimento: Mapped["Atendimento"] = relationship(
+        back_populates="pagamentos"
+    )
 
     def __str__(self) -> str:
-        return formatar_moeda(self.__valor)
+        return formatar_moeda(self.valor)

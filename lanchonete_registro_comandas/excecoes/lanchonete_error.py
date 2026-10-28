@@ -3,8 +3,18 @@ class LanchoneteError(Exception):
     pass
 
 
+class DadoInvalidoError(LanchoneteError):
+    """Indica que um dado informado é inválido (vazio, negativo etc.)."""
+    pass
+
+
 class MesaOcupadaError(LanchoneteError):
     """Indica que a mesa já possui um atendimento em andamento."""
+    pass
+
+
+class MesaJaCadastradaError(LanchoneteError):
+    """Indica que já existe uma mesa com o número informado."""
     pass
 
 
@@ -38,6 +48,16 @@ class ProdutoNaoEncontradoError(LanchoneteError):
     pass
 
 
+class ProdutoJaCadastradoError(LanchoneteError):
+    """Indica que já existe um produto com o código informado."""
+    pass
+
+
+class ProdutoIndisponivelError(LanchoneteError):
+    """Indica que o produto não está disponível para venda."""
+    pass
+
+
 class QuantidadeInvalidaError(LanchoneteError):
     """Indica que a quantidade informada é inválida."""
     pass
@@ -55,14 +75,4 @@ class AtendimentoNaoQuitadoError(LanchoneteError):
 
 class PersistenciaError(LanchoneteError):
     """Exceção base para erros na camada de persistência."""
-    pass
-
-
-class ArquivoCorrompidoError(PersistenciaError):
-    """Indica que um arquivo JSON está corrompido ou com formato inválido."""
-    pass
-
-
-class RelacionamentoInvalidoError(PersistenciaError):
-    """Indica que um ID referenciado no arquivo JSON não existe."""
     pass
