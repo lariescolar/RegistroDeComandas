@@ -230,8 +230,7 @@ LanchoneteError
 ├── ProdutoJaCadastradoError
 ├── ProdutoIndisponivelError
 ├── QuantidadeInvalidaError
-├── PagamentoInvalidoError
-└── PersistenciaError
+└── PagamentoInvalidoError
 ```
 
 As exceções são utilizadas para impedir operações que violem as regras de negócio do sistema.
